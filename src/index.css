@@ -44,7 +44,6 @@ a {
   text-decoration: none;
 }
 
-
 /* =========================
    NAVIGATION
 ========================= */
@@ -103,7 +102,6 @@ a {
   font-size: 13px;
   font-weight: 600;
 }
-
 
 /* =========================
    HERO
@@ -206,7 +204,6 @@ a {
   opacity: 0.5;
 }
 
-
 /* =========================
    GENERAL SECTIONS
 ========================= */
@@ -264,7 +261,6 @@ a {
   color: #5e5855;
 }
 
-
 /* =========================
    EXPERIENCE
 ========================= */
@@ -319,7 +315,6 @@ a {
 .brown {
   background: #684936;
 }
-
 
 /* =========================
    COLOURS
@@ -383,7 +378,6 @@ a {
   background: #684936;
 }
 
-
 /* =========================
    CTA
 ========================= */
@@ -418,7 +412,6 @@ a {
   color: white;
 }
 
-
 /* =========================
    FOOTER
 ========================= */
@@ -442,7 +435,6 @@ a {
   font-size: 10px;
   opacity: 0.5;
 }
-
 
 /* =========================
    REGISTRATION PAGE
@@ -615,7 +607,6 @@ a {
   font-weight: 600;
   color: #756d68;
 }
-
 
 /* =========================
    REVIEW PAGE
@@ -798,7 +789,6 @@ a {
   border-radius: 100px;
 }
 
-
 /* =========================
    PAYMENT PAGE
 ========================= */
@@ -974,7 +964,6 @@ a {
   border-radius: 100px;
 }
 
-
 /* =========================
    ADMIN DASHBOARD
 ========================= */
@@ -985,7 +974,6 @@ a {
   background: #f4f0ec;
   color: #171414;
 }
-
 
 /* =========================
    ADMIN SIDEBAR
@@ -1096,7 +1084,6 @@ a {
   border-color: #641b32;
 }
 
-
 /* =========================
    ADMIN CONTENT
 ========================= */
@@ -1106,7 +1093,6 @@ a {
   margin-left: 250px;
   padding: 48px 5% 80px;
 }
-
 
 /* =========================
    ADMIN HEADER
@@ -1153,7 +1139,6 @@ a {
   border-radius: 50%;
   background: #641b32;
 }
-
 
 /* =========================
    ADMIN STATISTICS
@@ -1224,108 +1209,189 @@ a {
   font-weight: 500;
 }
 
-
 /* =========================
-   EVENT INFORMATION
+   EVENT INFORMATION EMAILS
 ========================= */
 
-.event-information-section {
-  margin-top: 55px;
+.email-section {
+  margin-top: 60px;
+  padding-bottom: 20px;
 }
 
-.event-information-card {
+.email-section .participants-header {
+  margin-bottom: 25px;
+}
+
+.email-section .attendance-description {
+  max-width: 620px;
+  margin-top: 10px;
+}
+
+/* Main email card */
+
+.email-form {
   padding: 28px;
   background: white;
   border: 1px solid #ded7d1;
 }
 
-.event-information-description {
-  max-width: 600px;
-  margin-bottom: 25px;
-  color: #817872;
-  font-size: 12px;
-  line-height: 1.7;
-}
+/* Form grid */
 
-.event-information-form {
+.email-form-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 18px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
 }
 
-.event-information-field {
+/* Individual fields */
+
+.email-field {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.event-information-field label {
+.email-field label {
   font-size: 9px;
   font-weight: 700;
   letter-spacing: 0.15em;
+  text-transform: uppercase;
   color: #641b32;
 }
 
-.event-information-field input {
+.email-field input {
   width: 100%;
-  height: 45px;
-  padding: 0 13px;
+  height: 46px;
+  padding: 0 14px;
   border: 1px solid #d8d0ca;
+  border-radius: 0;
   background: #faf8f6;
+  color: #302a27;
   outline: none;
+  font-family: 'DM Sans', sans-serif;
   font-size: 12px;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
-.event-information-field input:focus {
+.email-field input::placeholder {
+  color: #aaa19b;
+}
+
+.email-field input:hover {
+  border-color: #bdb3ac;
+}
+
+.email-field input:focus {
   border-color: #641b32;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(100, 27, 50, 0.06);
 }
 
-.event-information-field.full-width {
-  grid-column: 1 / -1;
+/* Recipient count */
+
+.email-recipient-count {
+  min-height: 48px;
+  margin-top: 24px;
+  padding: 13px 16px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  background: #faf8f6;
+  border: 1px solid #e4ddd7;
+  color: #817872;
+  font-size: 11px;
 }
 
-.send-event-information-button {
-  margin-top: 20px;
-  padding: 14px 20px;
+.email-recipient-count svg {
+  flex-shrink: 0;
+  color: #641b32;
+}
+
+.email-recipient-count strong {
+  color: #302a27;
+  font-weight: 700;
+}
+
+/* Error */
+
+.email-error {
+  margin-top: 15px;
+  padding: 13px 15px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  background: #f7e8eb;
+  border: 1px solid #ead0d7;
+  color: #641b32;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.email-error svg {
+  flex-shrink: 0;
+}
+
+/* Success */
+
+.email-success {
+  margin-top: 15px;
+  padding: 13px 15px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  background: #e8f1eb;
+  border: 1px solid #d2e3d8;
+  color: #315e43;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.email-success svg {
+  flex-shrink: 0;
+}
+
+/* Send button */
+
+.send-event-email-button {
+  min-width: 220px;
+  margin-top: 22px;
+  padding: 14px 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: none;
+  border-radius: 0;
   background: #641b32;
   color: white;
-  font-size: 11px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
   font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   transition:
     background 0.2s ease,
-    transform 0.2s ease;
+    transform 0.2s ease,
+    opacity 0.2s ease;
 }
 
-.send-event-information-button:hover {
+.send-event-email-button:hover:not(:disabled) {
   background: #4f1528;
   transform: translateY(-1px);
 }
 
-.send-event-information-button:disabled {
-  opacity: 0.6;
+.send-event-email-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.send-event-email-button:disabled {
+  opacity: 0.5;
   cursor: not-allowed;
-  transform: none;
 }
-
-.event-information-message {
-  margin-top: 15px;
-  padding: 12px 15px;
-  background: #e5eee8;
-  color: #315e43;
-  font-size: 11px;
-  font-weight: 600;
-}
-
-.event-information-error {
-  margin-top: 15px;
-  padding: 12px 15px;
-  background: #f1dfe4;
-  color: #641b32;
-  font-size: 11px;
-  font-weight: 600;
-}
-
 
 /* =========================
    ATTENDANCE
@@ -1485,7 +1551,6 @@ a {
   color: #641b32;
 }
 
-
 /* =========================
    PARTICIPANTS
 ========================= */
@@ -1538,7 +1603,6 @@ a {
   background: transparent;
   font-size: 11px;
 }
-
 
 /* =========================
    PARTICIPANT TABLE
@@ -1602,7 +1666,6 @@ tbody tr:hover {
   color: #641b32;
 }
 
-
 /* =========================
    STATUS BADGES
 ========================= */
@@ -1636,7 +1699,6 @@ tbody tr:hover {
   color: #315e43;
 }
 
-
 /* =========================
    ADMIN STATES
 ========================= */
@@ -1665,7 +1727,6 @@ tbody tr:hover {
   color: #641b32;
   font-size: 12px;
 }
-
 
 /* =========================
    CONFIRMATION PAGE
@@ -1843,7 +1904,6 @@ tbody tr:hover {
   color: #666;
 }
 
-
 /* =========================
    LOGIN PAGE
 ========================= */
@@ -1942,7 +2002,6 @@ tbody tr:hover {
   color: #641b32;
 }
 
-
 /* =========================
    RESPONSIVE — TABLET
 ========================= */
@@ -1968,7 +2027,6 @@ tbody tr:hover {
   }
 }
 
-
 /* =========================
    RESPONSIVE — 800px
 ========================= */
@@ -1983,7 +2041,6 @@ tbody tr:hover {
   .nav-links {
     display: none;
   }
-
 
   /* Hero */
 
@@ -2001,7 +2058,6 @@ tbody tr:hover {
     width: 220px;
     height: 220px;
   }
-
 
   /* General sections */
 
@@ -2039,7 +2095,6 @@ tbody tr:hover {
     flex-direction: column;
     align-items: flex-start;
   }
-
 
   /* Registration */
 
@@ -2084,7 +2139,6 @@ tbody tr:hover {
     flex-direction: column;
     gap: 10px;
   }
-
 
   /* Review */
 
@@ -2136,7 +2190,6 @@ tbody tr:hover {
     justify-content: center;
   }
 
-
   /* Payment */
 
   .payment-container {
@@ -2184,7 +2237,6 @@ tbody tr:hover {
   .payment-note {
     padding: 0 20px 25px;
   }
-
 
   /* Admin */
 
@@ -2281,15 +2333,17 @@ tbody tr:hover {
     padding: 18px;
   }
 
-  .event-information-form {
-    grid-template-columns: 1fr;
+  /* Email */
+
+  .email-form {
+    padding: 22px;
   }
 
-  .event-information-field.full-width {
-    grid-column: auto;
+  .email-form-grid {
+    grid-template-columns: 1fr;
+    gap: 17px;
   }
 }
-
 
 /* =========================
    RESPONSIVE — 600px
@@ -2321,11 +2375,25 @@ tbody tr:hover {
     padding: 13px;
   }
 
-  .event-information-card {
+  /* Email */
+
+  .email-section {
+    margin-top: 45px;
+  }
+
+  .email-form {
     padding: 20px;
   }
-}
 
+  .email-recipient-count {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .send-event-email-button {
+    width: 100%;
+  }
+}
 
 /* =========================
    RESPONSIVE — 500px
@@ -2340,7 +2408,6 @@ tbody tr:hover {
     font-size: 43px;
   }
 }
-
 
 /* =========================
    RESPONSIVE — 450px
@@ -2359,8 +2426,13 @@ tbody tr:hover {
     padding: 16px;
   }
 
-  .event-information-card {
+  .email-form {
     padding: 16px;
+  }
+
+  .email-field input {
+    height: 44px;
+    font-size: 11px;
   }
 
   .confirmation-card {
