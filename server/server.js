@@ -34,9 +34,6 @@ for (const variable of requiredEnvVars) {
    SUPABASE AUTH CLIENT
 ========================= */
 
-// Separate client used only for verifying
-// Supabase authentication tokens.
-
 const supabaseAuth = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY,
@@ -65,16 +62,19 @@ const requireAdmin = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
 
-    // No authorization header
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    if (
+      !authHeader ||
+      !authHeader.startsWith('Bearer ')
+    ) {
       return res.status(401).json({
         success: false,
         message: 'Authentication required.',
       });
     }
 
-    // Extract access token
-    const token = authHeader.replace('Bearer ', '').trim();
+    const token = authHeader
+      .replace('Bearer ', '')
+      .trim();
 
     if (!token) {
       return res.status(401).json({
@@ -83,7 +83,6 @@ const requireAdmin = async (req, res, next) => {
       });
     }
 
-    // Verify token with Supabase
     const {
       data: { user },
       error,
@@ -101,7 +100,6 @@ const requireAdmin = async (req, res, next) => {
       });
     }
 
-    // Make sure the authenticated user is the admin
     if (
       !user.email ||
       user.email.toLowerCase() !==
@@ -113,7 +111,6 @@ const requireAdmin = async (req, res, next) => {
       });
     }
 
-    // Store authenticated admin user on request
     req.adminUser = user;
 
     next();
@@ -137,7 +134,8 @@ const requireAdmin = async (req, res, next) => {
 
 app.get('/', (req, res) => {
   res.json({
-    message: 'Event Registration API is running',
+    message:
+      'Event Registration API is running',
   });
 });
 
@@ -157,7 +155,6 @@ app.post(
         colourCode,
       } = req.body;
 
-      // Validate event details
       if (
         !date ||
         !time ||
@@ -171,7 +168,6 @@ app.post(
         });
       }
 
-      // Get all paid participants
       const {
         data: participants,
         error,
@@ -296,7 +292,10 @@ app.post(
         'https://api.paystack.co/transaction/initialize',
         {
           email,
+
+          // ₦1,000 = 100,000 kobo
           amount: '100000',
+
           currency: 'NGN',
 
           callback_url:
@@ -367,7 +366,10 @@ app.get(
         });
       }
 
-      // 1. Verify payment with Paystack
+      /*
+        1. Verify payment with Paystack
+      */
+
       const response = await axios.get(
         `https://api.paystack.co/transaction/verify/${reference}`,
         {
@@ -381,7 +383,24 @@ app.get(
       const transaction =
         response.data.data;
 
-      // 2. Confirm payment was successful
+      console.log(
+        'Paystack transaction:',
+        {
+          reference:
+            transaction.reference,
+          status:
+            transaction.status,
+          amount:
+            transaction.amount,
+          currency:
+            transaction.currency,
+        }
+      );
+
+      /*
+        2. Confirm payment was successful
+      */
+
       if (
         transaction.status !== 'success'
       ) {
@@ -389,22 +408,55 @@ app.get(
           success: false,
           message:
             'Payment was not successful.',
-          status: transaction.status,
+          status:
+            transaction.status,
         });
       }
 
-      // 3. Confirm amount is exactly ₦1,000
+      /*
+        3. Confirm the registration fee
+           was fully paid.
+
+           ₦1,000 = 100,000 kobo.
+
+           Paystack may add its transaction fee
+           when fees are passed to the customer.
+
+           Therefore, we reject only payments
+           below ₦1,000.
+      */
+
+      const REGISTRATION_FEE = 100000;
+
+      console.log(
+        'Expected minimum amount:',
+        REGISTRATION_FEE
+      );
+
+      console.log(
+        'Amount returned by Paystack:',
+        transaction.amount
+      );
+
       if (
-        transaction.amount !== 100000
+        transaction.amount <
+        REGISTRATION_FEE
       ) {
         return res.status(400).json({
           success: false,
           message:
             'Invalid payment amount.',
+          expectedMinimum:
+            REGISTRATION_FEE,
+          received:
+            transaction.amount,
         });
       }
 
-      // 4. Confirm currency
+      /*
+        4. Confirm currency
+      */
+
       if (
         transaction.currency !== 'NGN'
       ) {
@@ -415,7 +467,10 @@ app.get(
         });
       }
 
-      // 5. Prevent duplicate payment processing
+      /*
+        5. Prevent duplicate payment processing
+      */
+
       const {
         data: existingParticipant,
         error: existingError,
@@ -429,7 +484,10 @@ app.get(
         .maybeSingle();
 
       if (existingError) {
-        console.error(existingError);
+        console.error(
+          'Existing participant lookup error:',
+          existingError
+        );
 
         return res.status(500).json({
           success: false,
@@ -438,7 +496,11 @@ app.get(
         });
       }
 
-      // If already processed, return existing participant
+      /*
+        If this payment has already been processed,
+        return the existing participant.
+      */
+
       if (existingParticipant) {
         return res.json({
           success: true,
@@ -449,8 +511,11 @@ app.get(
         });
       }
 
-      // 6. Get registration details
-      // from Paystack metadata
+      /*
+        6. Get registration details
+           from Paystack metadata
+      */
+
       const metadata =
         transaction.metadata;
 
@@ -475,13 +540,14 @@ app.get(
         });
       }
 
-      // 7. Create confirmed participant
-      //
-      // participant_id is intentionally NOT
-      // supplied here.
-      //
-      // Supabase automatically generates it
-      // using public.generate_participant_id()
+      /*
+        7. Create confirmed participant
+
+        participant_id is NOT supplied here.
+
+        Supabase automatically generates it
+        using public.generate_participant_id().
+      */
 
       const {
         data: participant,
@@ -489,15 +555,23 @@ app.get(
       } = await supabase
         .from('participants')
         .insert({
-          full_name: fullName,
+          full_name:
+            fullName,
+
           email:
             transaction.customer?.email,
+
           level,
+
           area_of_interest:
             areaOfInterest,
-          payment_status: 'Paid',
+
+          payment_status:
+            'Paid',
+
           paystack_reference:
             reference,
+
           attendance_status:
             'Not Attended',
         })
@@ -506,9 +580,14 @@ app.get(
 
       if (insertError) {
 
-        // Another request may have processed
-        // this payment at almost the same time.
-        if (insertError.code === '23505') {
+        /*
+          Another request may have processed
+          this payment at almost the same time.
+        */
+
+        if (
+          insertError.code === '23505'
+        ) {
           const {
             data:
               existingParticipant,
@@ -532,7 +611,10 @@ app.get(
           }
         }
 
-        console.error(insertError);
+        console.error(
+          'Participant insert error:',
+          insertError
+        );
 
         return res.status(500).json({
           success: false,
@@ -541,7 +623,10 @@ app.get(
         });
       }
 
-      // 8. Send confirmation email
+      /*
+        8. Send confirmation email
+      */
+
       const emailResult =
         await sendConfirmationEmail(
           participant
@@ -553,8 +638,10 @@ app.get(
           emailResult.error
         );
 
-        // Registration remains successful
-        // even if email delivery fails.
+        /*
+          Registration remains successful
+          even if email delivery fails.
+        */
       } else {
         console.log(
           'Confirmation email sent successfully to:',
@@ -562,7 +649,10 @@ app.get(
         );
       }
 
-      // 9. Return confirmed participant
+      /*
+        9. Return confirmed participant
+      */
+
       return res.json({
         success: true,
         message:
