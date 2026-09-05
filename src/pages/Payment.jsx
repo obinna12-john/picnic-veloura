@@ -18,20 +18,23 @@ function Payment() {
   const [error, setError] = useState('');
 
   /*
-    Check if Paystack has returned the customer
-    to this page with a payment reference.
+    Get Paystack reference from the URL.
+  */
+  const params = new URLSearchParams(
+    window.location.search
+  );
+
+  const reference = params.get('reference');
+
+  /*
+    When Paystack redirects back to this page,
+    verify the payment using the reference.
   */
   useEffect(() => {
-    const params = new URLSearchParams(
-      window.location.search
-    );
-
-    const reference = params.get('reference');
-
     if (reference) {
       verifyPayment(reference);
     }
-  }, []);
+  }, [reference]);
 
   const verifyPayment = async (reference) => {
     setLoading(true);
@@ -44,25 +47,33 @@ function Payment() {
 
       const data = await response.json();
 
+      console.log(
+        'Payment verification response:',
+        data
+      );
+
       if (!response.ok || !data.success) {
         throw new Error(
-          data.message || 'Payment verification failed.'
+          data.message ||
+            'Payment verification failed.'
         );
       }
 
       /*
-        Payment has been verified successfully.
-
-        data.participant contains:
-        - participant_id
-        - full_name
-        - email
-        - level
-        - area_of_interest
-        - payment_status
-        - etc.
+        Make sure the backend actually returned
+        the participant information.
       */
+      if (!data.participant) {
+        throw new Error(
+          'Payment was verified, but registration details were not returned.'
+        );
+      }
 
+      /*
+        Payment verified successfully.
+        Send participant information to
+        the confirmation page.
+      */
       navigate('/confirmation', {
         state: {
           participant: data.participant,
@@ -78,24 +89,83 @@ function Payment() {
 
       setError(
         error.message ||
-        'We could not verify your payment.'
+          'We could not verify your payment.'
       );
 
       setLoading(false);
     }
   };
 
-  if (!formData && !loading) {
+  /*
+    If Paystack has returned us to this page
+    with a payment reference, show the verification
+    screen instead of "No registration found."
+  */
+  if (reference) {
     return (
       <main className="payment-page">
         <div className="payment-empty">
-          <h1>No registration found.</h1>
+
+          {loading ? (
+            <>
+              <h1>
+                Confirming your payment...
+              </h1>
+
+              <p>
+                Please wait while we confirm your
+                payment and registration.
+              </p>
+            </>
+          ) : error ? (
+            <>
+              <h1>
+                Payment verification failed.
+              </h1>
+
+              <p>{error}</p>
+
+              <button
+                onClick={() =>
+                  navigate('/register')
+                }
+              >
+                Back to Registration
+              </button>
+            </>
+          ) : null}
+
+        </div>
+      </main>
+    );
+  }
+
+  /*
+    No Paystack reference means this is the normal
+    payment page before payment has been made.
+  */
+  if (!formData) {
+    return (
+      <main className="payment-page">
+        <div className="payment-empty">
+
+          <h1>
+            No registration found.
+          </h1>
+
+          <p>
+            Please complete the registration process
+            before making payment.
+          </p>
 
           <button
-            onClick={() => navigate('/register')}
+            onClick={() =>
+              navigate('/register')
+            }
           >
             Go to Registration
           </button>
+
         </div>
       </main>
     );
@@ -127,10 +197,15 @@ function Payment() {
 
       const data = await response.json();
 
+      console.log(
+        'Payment initialization response:',
+        data
+      );
+
       if (!response.ok || !data.success) {
         throw new Error(
           data.message ||
-          'Unable to initialize payment.'
+            'Unable to initialize payment.'
         );
       }
 
@@ -148,31 +223,12 @@ function Payment() {
 
       setError(
         error.message ||
-        'Something went wrong while starting payment.'
+          'Something went wrong while starting payment.'
       );
 
       setLoading(false);
     }
   };
-
-  /*
-    While Paystack payment is being verified,
-    show a simple loading state.
-  */
-  if (loading && !formData) {
-    return (
-      <main className="payment-page">
-        <div className="payment-empty">
-          <h1>Confirming your payment...</h1>
-
-          <p>
-            Please wait while we confirm your
-            registration.
-          </p>
-        </div>
-      </main>
-    );
-  }
 
   return (
     <main className="payment-page">
@@ -237,7 +293,10 @@ function Payment() {
             </div>
 
             <div>
-              <span>REGISTRATION</span>
+              <span>
+                REGISTRATION
+              </span>
+
               <strong>
                 Picnic Veloura
               </strong>
@@ -249,7 +308,9 @@ function Payment() {
           <div className="payment-summary">
 
             <div>
-              <span>PARTICIPANT</span>
+              <span>
+                PARTICIPANT
+              </span>
 
               <strong>
                 {formData.fullName}
@@ -257,7 +318,9 @@ function Payment() {
             </div>
 
             <div>
-              <span>CLASS LEVEL</span>
+              <span>
+                CLASS LEVEL
+              </span>
 
               <strong>
                 {formData.level}
@@ -265,7 +328,9 @@ function Payment() {
             </div>
 
             <div>
-              <span>AREA OF INTEREST</span>
+              <span>
+                AREA OF INTEREST
+              </span>
 
               <strong>
                 {formData.areaOfInterest === 'None'
@@ -320,6 +385,7 @@ function Payment() {
       </section>
 
       <footer className="simple-footer">
+
         <span>
           PICNIC VELOURA
         </span>
@@ -327,6 +393,7 @@ function Payment() {
         <span>
           COLOURS AND FUN.
         </span>
+
       </footer>
 
     </main>
