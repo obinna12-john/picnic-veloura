@@ -17,19 +17,12 @@ function Payment() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  /*
-    Get Paystack reference from the URL.
-  */
   const params = new URLSearchParams(
     window.location.search
   );
 
   const reference = params.get('reference');
 
-  /*
-    When Paystack redirects back to this page,
-    verify the payment using the reference.
-  */
   useEffect(() => {
     if (reference) {
       verifyPayment(reference);
@@ -59,21 +52,11 @@ function Payment() {
         );
       }
 
-      /*
-        Make sure the backend actually returned
-        the participant information.
-      */
       if (!data.participant) {
         throw new Error(
           'Payment was verified, but registration details were not returned.'
         );
       }
-
-      /*
-        Payment verified successfully.
-        Send participant information to
-        the confirmation page.
-      */
       navigate('/confirmation', {
         state: {
           participant: data.participant,
