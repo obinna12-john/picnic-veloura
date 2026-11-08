@@ -199,7 +199,7 @@ function Register() {
                 Select your interest
               </option>
 
-              <option value="Painting">
+              {/* <option value="Painting">
                 Painting
               </option>
 
@@ -213,7 +213,7 @@ function Register() {
 
               <option value="Tailoring">
                 Tailoring
-              </option>
+              </option> */}
 
               <option value="None">
                 None / Just here for the food, vibes and plot 😂
