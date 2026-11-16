@@ -266,7 +266,6 @@ app.post(
 
 app.post(
   '/api/payment/initialize',
-  requireOpenRegistration,
   async (req, res) => {
     try {
       const {
