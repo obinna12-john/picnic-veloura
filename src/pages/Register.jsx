@@ -279,10 +279,9 @@ function Register() {
         padding: '24px',
       }}
     >
-      <h1>Registration Temporarily Closed</h1>
+      <h1>Registration Closed</h1>
       <p>
-        Registration is temporarily closed.
-        Please check back for updates.
+        Registration is closed.
       </p>
     </div>
   );
