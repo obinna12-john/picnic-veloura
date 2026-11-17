@@ -49,7 +49,30 @@ const supabaseAuth = createClient(
    APP
 ========================= */
 
+
+/* =========================
+   APP
+========================= */
+
 const app = express();
+
+// Registration control
+const isRegistrationOpen = () => {
+  return process.env.REGISTRATION_OPEN?.toLowerCase() !== 'false';
+};
+
+const requireOpenRegistration = (req, res, next) => {
+  if (!isRegistrationOpen()) {
+    return res.status(403).json({
+      success: false,
+      code: 'REGISTRATION_CLOSED',
+      message:
+        'Registration is temporarily closed. Please check back for updates.',
+    });
+  }
+
+  next();
+};
 
 app.use(cors());
 app.use(express.json());
@@ -266,6 +289,7 @@ app.post(
 
 app.post(
   '/api/payment/initialize',
+    requireOpenRegistration,
   async (req, res) => {
     try {
       const {
